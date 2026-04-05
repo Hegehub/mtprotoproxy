@@ -98,7 +98,7 @@ docker compose version
 Клонируйте репозиторий:
 
 ```bash
-git clone -b stable https://github.com/alexbers/mtprotoproxy.git
+git clone -b stable https://github.com/hegehub/mtprotoproxy.git
 cd mtprotoproxy
 ```
 
