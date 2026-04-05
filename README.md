@@ -22,6 +22,7 @@ the VDS instance with 1 CPU core and 1024MB RAM.
 
 ## More Instructions ##
 
+- [Инструкция на русском: установка и запуск на VPS с чистой системы](VPS_INSTALL_RU.md)
 - [Running without Docker](https://github.com/alexbers/mtprotoproxy/wiki/Running-Without-Docker)
 - [Optimization and fine tuning](https://github.com/alexbers/mtprotoproxy/wiki/Optimization-and-Fine-Tuning)
 
