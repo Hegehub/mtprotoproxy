@@ -34,3 +34,21 @@ The proxy can be launched:
 - several times, clients will be automaticaly balanced between instances
 - with uvloop module to get an extra speed boost
 - with runtime statistics exported to [Prometheus](https://prometheus.io/)
+
+### Webshare SOCKS5 bootstrap
+
+If you use Webshare as an upstream proxy provider, you can let the proxy fetch SOCKS5
+credentials automatically on startup (and on `SIGUSR2` reload):
+
+```bash
+WEBSHARE_API_KEY=your_api_key
+WEBSHARE_PLAN_ID=your_plan_id
+WEBSHARE_MODE=direct
+```
+
+When both `WEBSHARE_API_KEY` and `WEBSHARE_PLAN_ID` are set, the app requests
+`GET https://proxy.webshare.io/api/v2/proxy/list/?mode=<mode>&plan_id=<plan_id>`
+with `Authorization: Token <api_key>`, takes the first proxy from the response and
+applies it as `SOCKS5_HOST/SOCKS5_PORT/SOCKS5_USER/SOCKS5_PASS`.
+
+Reference: https://apidocs.webshare.io/
