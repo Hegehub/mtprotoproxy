@@ -41,3 +41,9 @@ TLS_DOMAIN = os.getenv('TLS_DOMAIN', 'www.google.com')
 
 # Tag for advertising, obtainable from @MTProxybot
 AD_TAG = os.getenv('AD_TAG', '')
+
+# Optional: bootstrap SOCKS5 upstream settings from Webshare API.
+# API docs: https://apidocs.webshare.io/
+WEBSHARE_API_KEY = os.getenv('WEBSHARE_API_KEY', '')
+WEBSHARE_PLAN_ID = os.getenv('WEBSHARE_PLAN_ID', '')
+WEBSHARE_MODE = os.getenv('WEBSHARE_MODE', 'direct')

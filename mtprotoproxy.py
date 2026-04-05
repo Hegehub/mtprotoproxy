@@ -19,6 +19,7 @@ import signal
 import os
 import stat
 import traceback
+import json
 
 
 TG_DATACENTER_PORT = 443
@@ -206,6 +207,9 @@ def init_config():
     conf_dict.setdefault("SOCKS5_PORT", None)
     conf_dict.setdefault("SOCKS5_USER", None)
     conf_dict.setdefault("SOCKS5_PASS", None)
+    conf_dict.setdefault("WEBSHARE_API_KEY", "")
+    conf_dict.setdefault("WEBSHARE_PLAN_ID", "")
+    conf_dict.setdefault("WEBSHARE_MODE", "direct")
 
     if conf_dict["SOCKS5_HOST"] and conf_dict["SOCKS5_PORT"]:
         # Disable the middle proxy if using socks, they are not compatible
@@ -311,6 +315,49 @@ def apply_upstream_proxy_settings():
     elif hasattr(socket, "origsocket"):
         socket.socket = socket.origsocket
         del socket.origsocket
+
+
+def load_webshare_proxy_settings():
+    """
+    Optionally load SOCKS5 endpoint and credentials from Webshare API.
+    This is useful when credentials are rotated by provider.
+    """
+    api_key = str(getattr(config, "WEBSHARE_API_KEY", "") or "").strip()
+    plan_id = str(getattr(config, "WEBSHARE_PLAN_ID", "") or "").strip()
+    if not api_key or not plan_id:
+        return
+
+    mode = str(getattr(config, "WEBSHARE_MODE", "direct") or "direct").strip().lower()
+
+    params = {"mode": mode, "plan_id": plan_id}
+    query = urllib.parse.urlencode(params)
+    req = urllib.request.Request(
+        "https://proxy.webshare.io/api/v2/proxy/list/?%s" % query,
+        headers={"Authorization": "Token %s" % api_key},
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            payload = resp.read().decode("utf-8", errors="replace")
+        data = json.loads(payload)
+        results = data.get("results") or []
+        first_proxy = results[0] if results else {}
+
+        host = first_proxy.get("proxy_address")
+        port = first_proxy.get("ports", {}).get("socks5")
+        username = first_proxy.get("username")
+        password = first_proxy.get("password")
+
+        if host and port and username and password:
+            config.SOCKS5_HOST = host
+            config.SOCKS5_PORT = int(port)
+            config.SOCKS5_USER = username
+            config.SOCKS5_PASS = password
+            print_err("Loaded SOCKS5 credentials from Webshare API")
+        else:
+            print_err("Webshare API response has no usable SOCKS5 credentials")
+    except Exception as E:
+        print_err("Failed to load Webshare proxy settings:", E)
 
 
 def try_use_cryptography_module():
@@ -2234,6 +2281,7 @@ def setup_signals():
         def reload_signal(signum, frame):
             init_config()
             ensure_users_in_user_stats()
+            load_webshare_proxy_settings()
             apply_upstream_proxy_settings()
             print("Config reloaded", flush=True, file=sys.stderr)
             print_tg_info()
@@ -2351,6 +2399,7 @@ def create_utilitary_tasks(loop):
 def main():
     init_config()
     ensure_users_in_user_stats()
+    load_webshare_proxy_settings()
     apply_upstream_proxy_settings()
     init_ip_info()
     print_tg_info()
