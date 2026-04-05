@@ -5,15 +5,16 @@ Fast and simple to setup MTProto proxy written in Python.
 ## Starting Up ##
     
 1. `git clone -b stable https://github.com/alexbers/mtprotoproxy.git; cd mtprotoproxy`
-2. *(optional, recommended)* edit *config.py*, set **PORT**, **USERS** and **AD_TAG**
-3. `docker-compose up -d` (or just `python3 mtprotoproxy.py` if you don't like Docker)
-4. *(optional, get a link to share the proxy)* `docker-compose logs`
+2. Copy environment template and set **PORT**, **USERS** and (optionally) **AD_TAG**:
+   `cp .env.example .env && nano .env`
+3. Start in Docker: `docker compose up -d --build` (or run `python3 mtprotoproxy.py` without Docker)
+4. *(optional, get a link to share the proxy)* `docker compose logs`
 
 ![Demo](https://alexbers.com/mtprotoproxy/install_demo_v2.gif)
 
 ## Channel Advertising ##
 
-To advertise a channel get a tag from **@MTProxybot** and put it to *config.py*.
+To advertise a channel get a tag from **@MTProxybot** and put it into `.env` as `AD_TAG`.
 
 ## Performance ##
 

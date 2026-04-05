@@ -102,18 +102,19 @@ git clone -b stable https://github.com/alexbers/mtprotoproxy.git
 cd mtprotoproxy
 ```
 
-Откройте конфиг:
+Создайте env-файл из шаблона:
 
 ```bash
-nano config.py
+cp .env.example .env
+nano .env
 ```
 
 Минимально проверьте/измените:
-- `PORT` — порт прокси (например, `3256`)
-- `USERS` — список секретов
+- `PORT` — порт прокси (например, `443`)
+- `USERS` — список секретов в формате `имя:секрет`
 - `AD_TAG` — рекламный тег (опционально)
 
-> Секреты в `USERS` должны быть длинными и случайными.
+> Секреты в `USERS` должны быть длинными и случайными (32 hex-символа).
 
 ---
 
@@ -122,7 +123,7 @@ nano config.py
 Запуск в фоне:
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
 Проверка статуса:
@@ -145,12 +146,12 @@ docker compose logs -f --tail=100
 
 ```bash
 ufw allow OpenSSH
-ufw allow 3256/tcp
+ufw allow 443/tcp
 ufw --force enable
 ufw status
 ```
 
-Если вы поменяли порт в `config.py`, откройте именно его.
+Если вы поменяли `PORT` в `.env`, откройте именно его.
 
 Также убедитесь, что порт разрешен в **cloud firewall/security group** у вашего провайдера.
 
@@ -183,7 +184,7 @@ docker compose up -d --build
 
 ```bash
 # Проверка, что порт слушается
-ss -lntp | grep 3256
+ss -lntp | grep 443
 
 # Статус контейнеров
 docker compose ps
@@ -199,7 +200,7 @@ docker compose logs --tail=200
 - [ ] VPS переустановлен через панель провайдера
 - [ ] Установлен Docker + Docker Compose Plugin
 - [ ] Склонирован `stable`-бранч репозитория
-- [ ] Настроен `config.py`
+- [ ] Настроен `.env`
 - [ ] Выполнен `docker compose up -d`
 - [ ] Открыт порт прокси в UFW и в cloud firewall
 - [ ] Проверены логи
